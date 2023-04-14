@@ -6,10 +6,12 @@
 	  <Authors>raciper</Authors>
 	  <PackageId>YouCanBuildIt</PackageId>
 	  <Version>1.0.0</Version>
-	  <FileVersion>1.0.0.0</FileVersion>
+	  <FileVersion>1.0.0.1</FileVersion>
 	  <Description>Allow Cities: Skylines players to continue building even when out of money, but charges interest on overdrawn balances.</Description>
 	  <Title>You Can Build It</Title>
-	  <AssemblyVersion>1.0.0.0</AssemblyVersion>
+	  <AssemblyVersion>1.0.0.1</AssemblyVersion>
+	  <RepositoryType>git</RepositoryType>
+	  <RepositoryUrl>https://github.com/raciper/YouCanBuildIt</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
