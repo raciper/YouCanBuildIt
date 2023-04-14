@@ -36,30 +36,6 @@ namespace YouCanBuildIt
             set => _annualRate = value;
         }
 
-        /*
-        public void OnEnabled()
-        {
-            HarmonyHelper.EnsureHarmonyInstalled();
-            if (!_annualRate.HasValue)
-            {
-                _annualRate = PlayerPrefs.GetFloat(ANNUAL_RATE, 0.03f);
-            }
-            if (!_chargeInterest.HasValue)
-            {
-                _chargeInterest = PlayerPrefs.GetInt(CHARGE_INTEREST, 1);
-            }
-        }
-
-        public override void OnCreated(ILoading loading)
-        {
-            if (HarmonyHelper.IsHarmonyInstalled) Patcher.PatchAll();
-        }
-
-        public override void OnReleased()
-        {
-            if (HarmonyHelper.IsHarmonyInstalled) Patcher.UnpatchAll();
-        }
-        */
 
         public void OnSettingsUI(UIHelperBase helper)
         {
