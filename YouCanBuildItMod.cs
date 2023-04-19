@@ -42,6 +42,9 @@ namespace YouCanBuildIt
             set => _annualRate = value;
         }
 
+        // Allow Settings to be set both when in-game and when in content manager
+        //    When In-game, only the values are set.
+        //    When in content manager, Player Prefs are updated, to be used for any game that does not already have saved settings.
         public void OnSettingsUI(UIHelperBase helper)
         {
             if (!_chargeInterest.HasValue) // If No Value has been set, then first entry
@@ -83,6 +86,10 @@ namespace YouCanBuildIt
             }
         }
 
+
+        /// <summary>
+        /// Get Player preferences for Default Settings if available, if not, set at mod defaults
+        /// </summary>
         public static void LoadPlayerPrefs()
         {
             _chargeInterest = PlayerPrefs.GetInt(CHARGE_INTEREST, 1);
@@ -95,7 +102,7 @@ namespace YouCanBuildIt
         }
     }
 
-
+    // Always respond with enough money when checking for amount of money needed.
     public class BlankCheck : EconomyExtensionBase
     {
         public override int OnPeekResource(EconomyResource resource, int amount)
@@ -119,12 +126,14 @@ namespace YouCanBuildIt
 
             if (game_datetime.Ticks > next_payment.Ticks)
             {
-                long balance = EconomyManager.playerMoney;
+                long balance = EconomyManager.playerMoney;  // Get Balance in full units.
 
                 // If Balance is below 0 charge interest
                 if (balance < 0)
                 {
-                    int fee = (int)Math.Ceiling(balance * 100 * YouCanBuildItMod.AnnualRate / 52.143);
+                    // Calculate payments in 100ths of units (cents?)
+                    int fee = (int)Math.Ceiling(balance * 100 * YouCanBuildItMod.AnnualRate / 52.143);   
+                    // Charge interest as a LoanPayment for budgeting panel
                     EconomyManager.instance.FetchResource(EconomyManager.Resource.LoanPayment, -fee, ItemClass.Service.None, ItemClass.SubService.None, ItemClass.Level.None);
                 }
                 next_payment = game_datetime.AddDays(7);

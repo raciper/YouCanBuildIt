@@ -13,18 +13,17 @@ namespace YouCanBuildIt
     {
         public const string MOD_NAME = "YouCanBuildIt";
 
+        // Try to get settings from GameData at load
         public override void OnLoadData()
         {
             base.OnLoadData();
 
             try
             {
-
-                // When Not part of the Save Game, Use what was loaded
                 byte[] byteArray = serializableDataManager.LoadData(MOD_NAME);
                 if (byteArray == null || byteArray.Length == 0)
                 {
-                    throw new Exception("No Exiting YouCanBuildIt Settings");
+                    throw new Exception("No Existing YouCanBuildIt Settings in Game Data, using Player Preferences.");
                 }
                 BinaryFormatter formatter = new BinaryFormatter();
                 using (MemoryStream stream = new MemoryStream(byteArray))
