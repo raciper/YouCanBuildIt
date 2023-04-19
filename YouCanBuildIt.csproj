@@ -5,11 +5,11 @@
 	  <Company>ciper.com</Company>
 	  <Authors>raciper</Authors>
 	  <PackageId>YouCanBuildIt</PackageId>
-	  <Version>1.0.0</Version>
-	  <FileVersion>1.0.0.1</FileVersion>
+	  <Version>1.1.0</Version>
+	  <FileVersion>1.1.0.0</FileVersion>
 	  <Description>Allow Cities: Skylines players to continue building even when out of money, but charges interest on overdrawn balances.</Description>
 	  <Title>You Can Build It</Title>
-	  <AssemblyVersion>1.0.0.1</AssemblyVersion>
+	  <AssemblyVersion>1.1.0.0</AssemblyVersion>
 	  <RepositoryType>git</RepositoryType>
 	  <RepositoryUrl>https://github.com/raciper/YouCanBuildIt</RepositoryUrl>
   </PropertyGroup>
@@ -32,8 +32,8 @@
     </Reference>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="mkdir &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)&quot;&#xD;&#xA;del &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)\$(TargetFileName)&quot;&#xD;&#xA;xcopy /y &quot;$(TargetPath)&quot; &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)&quot;" />
-  </Target>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="mkdir &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)&quot;&#xD;&#xA;del &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)\$(TargetFileName)&quot;&#xD;&#xA;xcopy /y &quot;$(TargetPath)&quot; &quot;%25LOCALAPPDATA%25\Colossal Order\Cities_Skylines\Addons\Mods\$(SolutionName)&quot;&#xD;&#xA;xcopy /y &quot;$(TargetPath)&quot; &quot;E:\Steam\steamapps\workshop\content\255710\2962363030&quot;" />
+	</Target>
 
 </Project>

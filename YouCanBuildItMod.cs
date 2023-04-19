@@ -5,6 +5,11 @@ using UnityEngine;
 using ColossalFramework;
 //using CitiesHarmony.API;
 using ColossalFramework.UI;
+using static UnityStandardAssets.CinematicEffects.TemporalAntiAliasing;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Reflection;
+using ColossalFramework.Plugins;
 
 namespace YouCanBuildIt
 {
@@ -15,8 +20,9 @@ namespace YouCanBuildIt
     /// Negative players are charged interest on their negative balance on a weekly basis.   
     /// The interest rate is 0 to 36% based on the settings in the control panel.  This can be turned off.
     /// </summary>
-    public class YouCanBuildItMod : LoadingExtensionBase, IUserMod
+    public class YouCanBuildItMod : IUserMod
     {
+        public static string ModName = "YouCanBuildit";
         public string Name => "You Can Build It";
         public string Description => "Allows you to build building even if you cannot affort it.";
         public const string ANNUAL_RATE = "CanYouBuildIt.AnnualRate";
@@ -36,20 +42,32 @@ namespace YouCanBuildIt
             set => _annualRate = value;
         }
 
-
         public void OnSettingsUI(UIHelperBase helper)
         {
-            // Create a slider and label for the mod options
+            if (!_chargeInterest.HasValue) // If No Value has been set, then first entry
+            {
+                LoadPlayerPrefs();         // Load Player Defaults
+            }
 
-            UIHelperBase group = (UIHelperBase)helper.AddGroup("You Can Build It - Interest Charges");
+            // determine if in Game or in Start Menu
+            bool inGame = Singleton<SimulationManager>.instance.SimulationPaused;
+
+            // Create a slider and label for the mod options
+            UIHelperBase group = (UIHelperBase)helper.AddGroup("You Can Build It - " + (inGame ? "Game" : "Default") + " Interest Charges");
             UICheckBox label = (UICheckBox)group.AddCheckbox(rateText, ChargeInterest, OnChargeInterestChanged);
             UISlider slider = (UISlider)group.AddSlider("Set Annual Interest Rate", 0.0f, 0.36f, 0.0025f, AnnualRate, OnSliderValueChanged);
             UIButton resetButton = (UIButton)group.AddButton("Reset to 3%", () => { slider.value = 0.03f; });
+            UIHelperBase version = (UIHelperBase)helper.AddGroup("You Can Build It, Version: " + Assembly.GetExecutingAssembly().GetName().Version.ToString() + ", Copyright 2023");
 
+            // Save the Interest Rate Saving.
             void OnChargeInterestChanged(bool value)
             {
                 ChargeInterest = value;
-                PlayerPrefs.SetInt(CHARGE_INTEREST, ChargeInterest ? 1 : 0);
+                if (!inGame)
+                {
+                    PlayerPrefs.SetInt(CHARGE_INTEREST, ChargeInterest ? 1 : 0);
+                    PlayerPrefs.Save();
+                }
             }
 
             // Update the label text when the slider value changes
@@ -57,15 +75,24 @@ namespace YouCanBuildIt
             {
                 AnnualRate = value;
                 label.text = rateText;
-                PlayerPrefs.SetFloat(ANNUAL_RATE, AnnualRate);
+                if (!inGame)
+                {
+                    PlayerPrefs.SetFloat(ANNUAL_RATE, AnnualRate);
+                    PlayerPrefs.Save();
+                }
             }
+        }
+
+        public static void LoadPlayerPrefs()
+        {
+            _chargeInterest = PlayerPrefs.GetInt(CHARGE_INTEREST, 1);
+            _annualRate = PlayerPrefs.GetFloat(ANNUAL_RATE, 0.03f);
         }
                 
         private string rateText
         {
             get => $"Charge Interest on Negative Balances at {AnnualRate.ToString("P2")}";
         }
-
     }
 
 
@@ -74,13 +101,13 @@ namespace YouCanBuildIt
         public override int OnPeekResource(EconomyResource resource, int amount)
         {
             EconomyManager manager = Singleton<EconomyManager>.instance;
-            manager.m_properties.m_bailoutLimit = int.MinValue;
-            return amount;
+            manager.m_properties.m_bailoutLimit = int.MinValue;           // Set Bailout to Max to prevent Bankruptcy
+            return amount;                                                // Always allow to build
         }
-
         public override bool OverrideDefaultPeekResource => true;
     }
     
+    // Charge Interest once a week
     public class ChargeInterest : ThreadingExtensionBase
     {
         static DateTime next_payment = DateTime.MinValue;
